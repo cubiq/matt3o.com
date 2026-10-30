@@ -1,7 +1,7 @@
 export const SITE_TITLE = 'matt3o.com';
 export const SITE_TAGLINE = "a maker's log // keycaps, custom keyboards, 3d printing, DIY, linux & stuff";
 export const SITE_DESCRIPTION =
-  'Personal blog and maker log by Matteo Spinelli (matt3o) — creator of MT3, MTNU, PBS & PFF keycap profiles, WhiteFox keyboard, open-source hardware, 3D printing, and Linux.';
+  'Blog by Matteo Spinelli (matt3o) on custom keycap profiles (MT3, MTNU, PBS, PFF), mechanical keyboards, 3D printing, Linux, open source and other nerdy stuff';
 export const SITE_AUTHOR = 'Matteo Spinelli (matt3o)';
 
 export const DEFAULT_CATEGORIES = [
@@ -23,7 +23,7 @@ export const DEFAULT_CATEGORIES = [
   {
     name: 'Reviews',
     slug: 'reviews',
-    description: 'Hands-on testing and teardowns of switches, mechanical keyboards, 3D printers, and trackballs.',
+    description: 'Hands-on testing and teardowns of switches, keyboards, 3D printers, and other nerdy stuff.',
   },
 ] as const;
 

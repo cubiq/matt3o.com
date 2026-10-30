@@ -1,8 +1,12 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import PostCard from '../components/PostCard.astro';
-import { getPublishedPosts, getAllCategories, getAllTags } from '../utils/posts';
-import { POSTS_PER_PAGE } from '../consts';
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PostCard from "../components/PostCard.astro";
+import {
+  getPublishedPosts,
+  getAllCategories,
+  getAllTags,
+} from "../utils/posts";
+import { POSTS_PER_PAGE } from "../consts";
 
 const allPosts = await getPublishedPosts();
 const totalPages = Math.ceil(allPosts.length / POSTS_PER_PAGE);
@@ -25,19 +29,25 @@ const tags = await getAllTags();
 
     <div class="intro-body">
       <p class="intro-cmd">
-        <span class="prompt-prefix">matt3o@log</span>:<span class="prompt-path">~</span>$ cat motd.txt
+        <span class="prompt-prefix">matt3o@log</span>:<span class="prompt-path"
+          >~</span
+        >$ cat motd.txt
       </p>
       <p class="intro-text">
-        Welcome to <strong>matt3o.com</strong> &mdash; a maker's log on custom keycap profiles (MT3, MTNU, PBS, PFF), mechanical keyboards, 3D printing, Linux systems, and open hardware projects.
+        Welcome to <strong>matt3o.com</strong> &mdash; a maker's log on custom keycap
+        profiles (MT3, MTNU, PBS, PFF), mechanical keyboards, 3D printing, Linux systems,
+        and open source and other nerdy stuff.
       </p>
       <div class="intro-links">
         <div class="quick-cats">
-          {categories.map((cat) => (
-            <a href={`/categories/${cat.slug}`} class="cat-pill">
-              <span class="cat-pill-name">{cat.name}</span>
-              <span class="cat-pill-count">{cat.count}</span>
-            </a>
-          ))}
+          {
+            categories.map((cat) => (
+              <a href={`/categories/${cat.slug}`} class="cat-pill">
+                <span class="cat-pill-name">{cat.name}</span>
+                <span class="cat-pill-count">{cat.count}</span>
+              </a>
+            ))
+          }
           <a href="/archive" class="cat-pill archive-pill">
             <span class="cat-pill-name">All Posts Archive</span>
             <span class="cat-pill-count">{allPosts.length}</span>
@@ -50,47 +60,60 @@ const tags = await getAllTags();
   <section class="latest-posts-section" aria-labelledby="latest-heading">
     <div class="section-header">
       <h1 id="latest-heading" class="section-title">
-        <span class="prompt-prefix">$</span> ls -lt ./posts/ | head -n {POSTS_PER_PAGE}
+        <span class="prompt-prefix">$</span> ls -lt ./posts/ | head -n {
+          POSTS_PER_PAGE
+        }
       </h1>
-      <span class="section-sub">Page 1 of {totalPages} ({allPosts.length} total articles)</span>
+      <span class="section-sub"
+        >Page 1 of {totalPages} ({allPosts.length} total articles)</span
+      >
     </div>
 
     <div class="posts-stack">
-      {posts.map((post, idx) => (
-        <PostCard post={post} priority={idx === 0} />
-      ))}
+      {posts.map((post, idx) => <PostCard post={post} priority={idx === 0} />)}
     </div>
 
-    {totalPages > 1 && (
-      <nav class="pagination-bar terminal-box" aria-label="Pagination">
-        <span class="page-btn disabled" aria-disabled="true">&larr; newer</span>
-        <div class="page-numbers">
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
-            <a
-              href={num === 1 ? '/' : `/page/${num}`}
-              class:list={['page-num', { active: num === 1 }]}
-              aria-current={num === 1 ? 'page' : undefined}
-            >
-              [{num}]
-            </a>
-          ))}
-        </div>
-        <a href="/page/2" class="page-btn">older &rarr;</a>
-      </nav>
-    )}
+    {
+      totalPages > 1 && (
+        <nav class="pagination-bar terminal-box" aria-label="Pagination">
+          <span class="page-btn disabled" aria-disabled="true">
+            &larr; newer
+          </span>
+          <div class="page-numbers">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
+              <a
+                href={num === 1 ? "/" : `/page/${num}`}
+                class:list={["page-num", { active: num === 1 }]}
+                aria-current={num === 1 ? "page" : undefined}
+              >
+                [{num}]
+              </a>
+            ))}
+          </div>
+          <a href="/page/2" class="page-btn">
+            older &rarr;
+          </a>
+        </nav>
+      )
+    }
   </section>
 
-  <aside class="tags-cloud-box terminal-box" aria-labelledby="tags-cloud-heading">
+  <aside
+    class="tags-cloud-box terminal-box"
+    aria-labelledby="tags-cloud-heading"
+  >
     <div class="terminal-box-header">
       <span id="tags-cloud-heading" class="cloud-title">// topic tags</span>
       <a href="/tags" class="view-all-link">view all tags &rarr;</a>
     </div>
     <div class="tags-cloud-body">
-      {tags.map((tag) => (
-        <a href={`/tags/${tag.slug}`} class="tag-chip">
-          {tag.name} <span class="tag-num">({tag.count})</span>
-        </a>
-      ))}
+      {
+        tags.map((tag) => (
+          <a href={`/tags/${tag.slug}`} class="tag-chip">
+            {tag.name} <span class="tag-num">({tag.count})</span>
+          </a>
+        ))
+      }
     </div>
   </aside>
 </BaseLayout>
