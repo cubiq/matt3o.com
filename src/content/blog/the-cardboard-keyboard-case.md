@@ -73,4 +73,4 @@ At the end I believe you can build some pretty decent keyboard out of cheap mate
 
 Honestly I wouldn't recommend cardboard for a fullsize keyboard, the material is too bendy to be comfortable to type on a regular basis. But I guess the lesson here is that custom keyboards don't need to be expensive if you apply a little creativity!
 
-[Download the source files](http://cdn.matt3o.com/uploads/files/cardboard-case.zip)
+[Download the source files](/the-cardboard-keyboard-case/cardboard-case.zip)

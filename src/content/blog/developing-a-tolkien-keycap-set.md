@@ -37,7 +37,7 @@ So the following is what I came up with. On the left the original as we all know
 
 I know, the difference is minimal and the original is maybe more "aggressive", but I find the one on the right to be better overall calibrated.
 
-**If you are interested you can [freely download and use my file (SVG)](https://cdn.matt3o.com/uploads/files/the-one-ring-inscription-new.svg).**
+**If you are interested you can [freely download and use my file (SVG)](/developing-a-tolkien-keycap-set/the-one-ring-inscription-new.svg).**
 
 We are also working on some artisan/novelty keys. I'm not sure yet what we are going to do but the _Arkenstone_ --if done right-- would be really nice.
 

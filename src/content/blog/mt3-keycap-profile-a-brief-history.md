@@ -91,7 +91,7 @@ At **the end of 2018** Drop collected pre-orders but by the **summer of 2019** w
 
 What I know is that 2020 arrived and our lives changed forever. Covid hit China and Korea first then Italy (where I live) and the rest of the world.
 
-Susuwatari was the most complicated set to get the colors right for. I don't know why it took so long but I have dozens of [injection](https://cdn.matt3o.com/uploads/2022/04/susu-error1.jpg) [tests](https://cdn.matt3o.com/uploads/2022/04/susu-error2.jpg) and [color chips](https://cdn.matt3o.com/uploads/2022/04/susu-error3.jpg) and they've never been able to reach the desired result.
+Susuwatari was the most complicated set to get the colors right for. I don't know why it took so long but I have dozens of [injection](/mt3-keycap-profile-a-brief-history/images/susu-error1.jpg) [tests](/mt3-keycap-profile-a-brief-history/images/susu-error2.jpg) and [color chips](/mt3-keycap-profile-a-brief-history/images/susu-error3.jpg) and they've never been able to reach the desired result.
 
 In an incredibly difficult situation and with months (years?) of delays Drop managed to bring Susuwatari to life by the **second half of 2020**. Considering all that happened in 2020, that was quite an achievement.
 

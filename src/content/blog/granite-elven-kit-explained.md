@@ -43,6 +43,6 @@ This is how the letters look like on your keyboard.
 
 When you press Q you are actually writing the "P" Sindarin sound, but that's beside the point; the bottom line is that what is printed on the key is what shows on screen if you have Dan's font installed.
 
-To familiarize with this system I highly recommend to read the [Tengwar Help](http://cdn.matt3o.com/uploads/files/TengwarHelp.pdf) and the [Tengwar Keymap](http://cdn.matt3o.com/uploads/files/TengwarKeyMap.pdf), both from our hero Daniel Smith.
+To familiarize with this system I highly recommend to read the [Tengwar Help](/granite-elven-kit-explained/TengwarHelp.pdf) and the [Tengwar Keymap](/granite-elven-kit-explained/TengwarKeyMap.pdf), both from our hero Daniel Smith.
 
 In the coming days I'll publish a specific document on how to practically write some words in Elvish.
