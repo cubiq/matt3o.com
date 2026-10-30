@@ -157,6 +157,17 @@ main.main-content {
   padding-bottom: 4rem;
 }
 
+@media (max-width: 768px) {
+  .container {
+    padding: 0 0.9rem;
+  }
+
+  main.main-content {
+    padding-top: 1.15rem;
+    padding-bottom: 2.5rem;
+  }
+}
+
 /* Terminal Prompt & Accent Helpers */
 .prompt-prefix {
   color: var(--term-green);

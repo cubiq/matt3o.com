@@ -67,34 +67,6 @@ function isActive(href: string): boolean {
         </button>
       </nav>
     </div>
-
-    <div class="header-sub">
-      <p class="tagline">// {SITE_TAGLINE}</p>
-      <nav class="category-bar" aria-label="Categories">
-        <span class="cat-bar-label">dirs:</span>
-        <a href="/" class:list={["cat-bar-item", { active: pathname === "/" }]}
-          >all/</a
-        >
-        {
-          categories.map((cat) => (
-            <a
-              href={`/categories/${cat.slug}`}
-              class:list={[
-                "cat-bar-item",
-                {
-                  active:
-                    pathname === `/categories/${cat.slug}` ||
-                    pathname === `/categories/${cat.slug}/`,
-                },
-              ]}
-            >
-              {cat.name.toLowerCase()}/
-              <span class="cat-count">({cat.count})</span>
-            </a>
-          ))
-        }
-      </nav>
-    </div>
   </div>
 </header>
 
@@ -203,30 +175,6 @@ function isActive(href: string): boolean {
     border-radius: 2px;
   }
 
-  .header-sub {
-    margin-top: 0.65rem;
-    padding-top: 0.6rem;
-    border-top: 1px dashed var(--border-subtle);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 0.6rem;
-    font-size: 0.8rem;
-  }
-
-  .tagline {
-    margin: 0;
-    color: var(--text-muted);
-  }
-
-  .category-bar {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
   .cat-bar-label {
     color: var(--text-muted);
     font-weight: 600;
@@ -249,5 +197,37 @@ function isActive(href: string): boolean {
     color: var(--text-muted);
     font-size: 0.72rem;
     margin-left: 1px;
+  }
+
+  @media (max-width: 768px) {
+    .site-header {
+      position: static;
+      padding: 0.75rem 0 0.6rem;
+    }
+
+    .header-top {
+      gap: 0.5rem;
+    }
+
+    .brand-link {
+      font-size: 0.98rem;
+    }
+
+    .main-nav {
+      width: 100%;
+      justify-content: space-between;
+      gap: 0.2rem;
+    }
+
+    .nav-link {
+      font-size: 0.78rem;
+      padding: 0.2rem 0.38rem;
+    }
+
+    .search-trigger-btn {
+      font-size: 0.76rem;
+      padding: 0.2rem 0.5rem;
+      margin-left: auto;
+    }
   }
 </style>
