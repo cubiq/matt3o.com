@@ -1,0 +1,146 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getPublishedPosts } from '../../utils/posts';
+import { POSTS_PER_PAGE } from '../../consts';
+
+export async function getStaticPaths() {
+  const allPosts = await getPublishedPosts();
+  const totalPages = Math.ceil(allPosts.length / POSTS_PER_PAGE);
+
+  return Array.from({ length: totalPages - 1 }, (_, i) => {
+    const pageNum = i + 2;
+    const start = (pageNum - 1) * POSTS_PER_PAGE;
+    return {
+      params: { page: String(pageNum) },
+      props: {
+        posts: allPosts.slice(start, start + POSTS_PER_PAGE),
+        pageNum,
+        totalPages,
+        totalPosts: allPosts.length,
+      },
+    };
+  });
+}
+
+const { posts, pageNum, totalPages, totalPosts } = Astro.props;
+const prevUrl = pageNum === 2 ? '/' : `/page/${pageNum - 1}`;
+const nextUrl = pageNum < totalPages ? `/page/${pageNum + 1}` : null;
+---
+
+<BaseLayout title={`Posts — Page ${pageNum} of ${totalPages}`}>
+  <section class="latest-posts-section" aria-labelledby="page-heading">
+    <div class="section-header">
+      <h1 id="page-heading" class="section-title">
+        <span class="prompt-prefix">$</span> ls -lt ./posts/ // page {pageNum}
+      </h1>
+      <span class="section-sub">Page {pageNum} of {totalPages} ({totalPosts} total articles)</span>
+    </div>
+
+    <div class="posts-stack">
+      {posts.map((post, idx) => (
+        <PostCard post={post} priority={idx === 0} />
+      ))}
+    </div>
+
+    <nav class="pagination-bar terminal-box" aria-label="Pagination">
+      <a href={prevUrl} class="page-btn">&larr; newer</a>
+      <div class="page-numbers">
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
+          <a
+            href={num === 1 ? '/' : `/page/${num}`}
+            class:list={['page-num', { active: num === pageNum }]}
+            aria-current={num === pageNum ? 'page' : undefined}
+          >
+            [{num}]
+          </a>
+        ))}
+      </div>
+      {nextUrl ? (
+        <a href={nextUrl} class="page-btn">older &rarr;</a>
+      ) : (
+        <span class="page-btn disabled" aria-disabled="true">older &rarr;</span>
+      )}
+    </nav>
+  </section>
+</BaseLayout>
+
+<style>
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px dashed var(--border-color);
+  }
+
+  .section-title {
+    margin: 0;
+    font-size: 1.25rem;
+  }
+
+  .section-sub {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  .posts-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+
+  .pagination-bar {
+    margin-top: 2.25rem;
+    padding: 0.75rem 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .page-numbers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .page-num {
+    text-decoration: none;
+    color: var(--text-secondary);
+    padding: 0.2rem 0.45rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .page-num:hover,
+  .page-num.active {
+    color: #14171c;
+    background-color: var(--accent);
+    font-weight: 700;
+  }
+
+  .page-btn {
+    text-decoration: none;
+    color: var(--accent);
+    font-weight: 600;
+    padding: 0.25rem 0.65rem;
+    border: 1px solid var(--accent-border);
+    border-radius: var(--radius-sm);
+  }
+
+  .page-btn:hover:not(.disabled) {
+    background-color: var(--accent-dim);
+  }
+
+  .page-btn.disabled {
+    color: var(--text-muted);
+    border-color: var(--border-subtle);
+    cursor: default;
+  }
+</style>
+

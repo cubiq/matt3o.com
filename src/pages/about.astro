@@ -1,0 +1,336 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Button from "../components/Button.astro";
+---
+
+<BaseLayout
+  title="About"
+  description="About Matteo Spinelli (matt3o) — maker, designer of custom mechanical keyboards and keycap profiles, Linux enthusiast, and open-source advocate."
+>
+  <article class="about-page terminal-box">
+    <div class="terminal-box-header">
+      <div class="about-top-left">
+        <span class="terminal-dots" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </span>
+        <span>matt3o@workshop: ~/about.md</span>
+      </div>
+      <span class="about-status">chmod 644</span>
+    </div>
+
+    <div class="about-body prose">
+      <h1><span class="prompt-prefix">$</span> whoami</h1>
+
+      <p>
+        Hi, my name is <strong>Matteo Spinelli</strong> and this is my blog since
+        2016. After 10 years of ramblings about mechanical keyboards, 3D printing,
+        retro-computing, coding, ... I guess it was time for a change.
+      </p>
+
+      <p>
+        Internet is a very different place now, hell, 2016 feels like a
+        different life. We are in the middle of the AI bubble and creating
+        original content may seem superfluous if not stupid. I argue that actual
+        human generated content has never been so important. They want me to
+        believe that everything is easier and faster with AI, but nothing worth
+        doing has ever been easy.
+      </p>
+
+      <p>
+        Attention span is also very short nowadays and content is consumed in
+        video format, if it's written you rarely have more than 2 lines to tell
+        the whole story.
+      </p>
+
+      <p>
+        So why even bother keeping such an antiquated medium alive? Well, on one
+        side we need to feed the AI with new original data. If we all stop
+        creating the models will be closed in a loop forced to feed themselves
+        with more generated data and the result will be a diluted slop. So let's
+        give them some original data once in a while.
+      </p>
+
+      <p>
+        On the other hand I hope there's still someone interested in reading. I
+        haven't done much noteworthy lately --I know-- but I'll try to post
+        more, hopefully also some new videos.
+      </p>
+
+      <h2>What you'll find here</h2>
+
+      <ul>
+        <li>
+          <strong>Mechanical Keyboards &amp; Keycaps:</strong> My beloved keycap profiles,
+          like <a href="/tags/mt3">MT3</a>, <a href="/tags/mtnu">MTNU</a>, <a
+            href="/tags/pbs">PBS</a
+          > and all the others. And my reviews and ramblings about mechanical keyboards.
+        </li>
+        <li>
+          <strong>DIY &amp; 3D Printing:</strong> I use 3D printing a lot for prototyping.
+          Here you'll find my experience with this amazing technology.
+        </li>
+        <li>
+          <strong>Linux &amp; Open Source:</strong> Mostly dedicated to Self-hosted
+          services that respect user freedom.
+        </li>
+        <li>
+          <strong>Laser &amp; Ninjas &amp; Shit:</strong> And honestly whatever comes
+          to mind.
+        </li>
+      </ul>
+
+      <h2>Links &amp; Contact</h2>
+
+      <div class="about-actions">
+        <Button
+          href="https://discord.gg/matt3o"
+          variant="primary"
+          icon="external"
+          external
+        >
+          Discord Community
+        </Button>
+        <Button
+          href="https://mastodon.social/@cubiq"
+          variant="outline"
+          icon="external"
+          external
+        >
+          Mastodon (@cubiq)
+        </Button>
+        <Button
+          href="https://www.youtube.com/@matt3o"
+          variant="outline"
+          icon="external"
+          external
+        >
+          Youtube (@matt3o)
+        </Button>
+        <Button
+          href="https://github.com/cubiq"
+          variant="outline"
+          icon="code"
+          external
+        >
+          GitHub (@cubiq)
+        </Button>
+
+        <span id="email-slot" class="email-slot">
+          <button
+            type="button"
+            id="email-reveal-btn"
+            class="email-reveal-btn"
+            aria-label="Reveal email address"
+          >
+            <span class="btn-icon" aria-hidden="true">[@]</span>
+            <span>Reveal Email</span>
+          </button>
+        </span>
+
+        <Button href="/rss.xml" variant="ghost" icon="arrow"> RSS Feed </Button>
+      </div>
+    </div>
+  </article>
+</BaseLayout>
+
+<script>
+  const revealBtn = document.getElementById("email-reveal-btn");
+  const emailSlot = document.getElementById("email-slot");
+
+  revealBtn?.addEventListener(
+    "click",
+    () => {
+      // XOR-encoded char codes for 'hi@matt3o.com' (key: 42)
+      const encoded = [66, 67, 106, 71, 75, 94, 94, 25, 69, 4, 73, 69, 71];
+      const addr = encoded.map((b) => String.fromCharCode(b ^ 42)).join("");
+
+      if (!emailSlot) return;
+      emailSlot.innerHTML = "";
+
+      const mailLink = document.createElement("a");
+      mailLink.href = `mailto:${addr}`;
+      mailLink.className = "email-revealed-link";
+      mailLink.textContent = `[@] ${addr}`;
+
+      const copyBtn = document.createElement("button");
+      copyBtn.type = "button";
+      copyBtn.className = "email-copy-btn";
+      copyBtn.textContent = "[copy]";
+      copyBtn.setAttribute("aria-label", "Copy email address to clipboard");
+
+      copyBtn.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(addr);
+          copyBtn.textContent = "[copied!]";
+          setTimeout(() => {
+            copyBtn.textContent = "[copy]";
+          }, 1800);
+        } catch {
+          copyBtn.textContent = "[error]";
+        }
+      });
+
+      emailSlot.appendChild(mailLink);
+      emailSlot.appendChild(copyBtn);
+    },
+    { once: true },
+  );
+</script>
+
+<style>
+  .about-top-left {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .about-status {
+    color: var(--term-green);
+    font-size: 0.75rem;
+  }
+
+  .about-body {
+    padding: 1.75rem 1.85rem;
+    max-width: 100%;
+  }
+
+  .neofetch-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1.5rem;
+    align-items: center;
+    background-color: var(--bg-code);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 1.1rem 1.25rem;
+    margin: 1.5rem 0;
+  }
+
+  @media (max-width: 600px) {
+    .neofetch-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .ascii-art {
+    margin: 0;
+    padding: 0;
+    color: var(--accent);
+    font-size: 0.78rem;
+    line-height: 1.25;
+    background: transparent !important;
+    border: 0 !important;
+  }
+
+  .sysinfo-list {
+    margin: 0;
+    display: grid;
+    gap: 0.35rem;
+    font-size: 0.85rem;
+  }
+
+  .sysinfo-list div {
+    display: grid;
+    grid-template-columns: 95px 1fr;
+    gap: 0.5rem;
+  }
+
+  .sysinfo-list dt {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .sysinfo-list dt::after {
+    content: ":";
+  }
+
+  .sysinfo-list dd {
+    margin: 0;
+    color: var(--text-primary);
+  }
+
+  .about-actions {
+    margin-top: 1.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .email-slot {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin: 0.35rem 0.5rem 0.35rem 0;
+  }
+
+  .email-reveal-btn,
+  .email-revealed-link,
+  .email-copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-family: var(--font-mono);
+    font-size: 0.86rem;
+    font-weight: 600;
+    line-height: 1.3;
+    padding: 0.5rem 0.95rem;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .email-reveal-btn {
+    background-color: var(--bg-surface);
+    color: var(--accent);
+    border: 1px solid var(--accent-border);
+  }
+
+  .email-reveal-btn:hover,
+  .email-reveal-btn:focus-visible {
+    background-color: var(--accent-dim);
+    border-color: var(--accent);
+    color: var(--accent-bright);
+    transform: translateY(-1px);
+  }
+
+  :global(.email-revealed-link) {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 0.86rem;
+    font-weight: 600;
+    line-height: 1.3;
+    padding: 0.5rem 0.95rem;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    background-color: var(--accent);
+    color: #14171c;
+    border: 1px solid var(--accent);
+  }
+
+  :global(.email-revealed-link:hover) {
+    background-color: var(--accent-bright);
+    border-color: var(--accent-bright);
+    color: #14171c;
+  }
+
+  :global(.email-copy-btn) {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 600;
+    line-height: 1.3;
+    padding: 0.5rem 0.65rem;
+    border-radius: var(--radius-sm);
+    background-color: var(--bg-elevated);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+  }
+
+  :global(.email-copy-btn:hover) {
+    color: var(--accent-bright);
+    border-color: var(--accent-border);
+  }
+</style>

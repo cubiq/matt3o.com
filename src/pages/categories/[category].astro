@@ -1,0 +1,84 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getPublishedPosts, getAllCategories } from '../../utils/posts';
+import { slugify } from '../../consts';
+
+export async function getStaticPaths() {
+  const categories = await getAllCategories();
+  const posts = await getPublishedPosts();
+
+  return categories.map((cat) => ({
+    params: { category: cat.slug },
+    props: {
+      category: cat,
+      posts: posts.filter((p) => slugify(p.data.category) === cat.slug),
+    },
+  }));
+}
+
+const { category, posts } = Astro.props;
+---
+
+<BaseLayout title={`Category: ${category.name}`} description={category.description}>
+  <div class="archive-head terminal-box">
+    <div class="terminal-box-header">
+      <span><a href="/categories" class="back-link">&larr; categories</a> / {category.slug}</span>
+      <span class="cat-badge">{posts.length} {posts.length === 1 ? 'entry' : 'entries'}</span>
+    </div>
+    <div class="archive-head-body">
+      <h1><span class="prompt-prefix">dir:</span> {category.name}</h1>
+      <p>{category.description}</p>
+    </div>
+  </div>
+
+  {posts.length > 0 ? (
+    <div class="posts-stack">
+      {posts.map((post, idx) => (
+        <PostCard post={post} priority={idx === 0} />
+      ))}
+    </div>
+  ) : (
+    <div class="empty-box terminal-box">
+      <p>No entries filed under <code>{category.name}</code> yet.</p>
+    </div>
+  )}
+</BaseLayout>
+
+<style>
+  .archive-head {
+    margin-bottom: 2rem;
+  }
+
+  .back-link {
+    text-decoration: none;
+  }
+
+  .archive-head-body {
+    padding: 1.25rem 1.35rem;
+  }
+
+  .archive-head-body h1 {
+    margin: 0 0 0.4rem;
+    font-size: 1.55rem;
+  }
+
+  .archive-head-body p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.92rem;
+  }
+
+  .posts-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+
+  .empty-box {
+    padding: 2rem;
+    text-align: center;
+    color: var(--text-secondary);
+  }
+</style>
+

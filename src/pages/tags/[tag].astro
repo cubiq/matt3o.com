@@ -1,0 +1,72 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getPublishedPosts, getAllTags } from '../../utils/posts';
+import { slugify } from '../../consts';
+
+export async function getStaticPaths() {
+  const tags = await getAllTags();
+  const posts = await getPublishedPosts();
+
+  return tags.map((tag) => ({
+    params: { tag: tag.slug },
+    props: {
+      tag,
+      posts: posts.filter((p) => p.data.tags.some((t) => slugify(t) === tag.slug)),
+    },
+  }));
+}
+
+const { tag, posts } = Astro.props;
+---
+
+<BaseLayout title={`Tag: #${tag.name}`} description={`Articles tagged with #${tag.name}`}>
+  <div class="archive-head terminal-box">
+    <div class="terminal-box-header">
+      <span><a href="/tags" class="back-link">&larr; all tags</a> / #{tag.slug}</span>
+      <span class="cat-badge">{posts.length} {posts.length === 1 ? 'entry' : 'entries'}</span>
+    </div>
+    <div class="archive-head-body">
+      <h1><span class="prompt-prefix">tag:</span> #{tag.name}</h1>
+      <p>Showing all log entries tagged with <code>#{tag.name}</code>.</p>
+    </div>
+  </div>
+
+  <div class="posts-stack">
+    {posts.map((post, idx) => (
+      <PostCard post={post} priority={idx === 0} />
+    ))}
+  </div>
+</BaseLayout>
+
+<style>
+  .archive-head {
+    margin-bottom: 2rem;
+  }
+
+  .back-link {
+    text-decoration: none;
+  }
+
+  .archive-head-body {
+    padding: 1.25rem 1.35rem;
+  }
+
+  .archive-head-body h1 {
+    margin: 0 0 0.4rem;
+    font-size: 1.55rem;
+  }
+
+  .archive-head-body p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.92rem;
+  }
+
+  .posts-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+</style>
+

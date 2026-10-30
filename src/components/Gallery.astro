@@ -1,0 +1,189 @@
+---
+export interface GalleryItem {
+  src: string;
+  alt: string;
+  caption?: string;
+}
+
+interface Props {
+  images: GalleryItem[];
+  columns?: 2 | 3 | 4 | 5;
+  lightbox?: boolean;
+  caption?: string;
+  variant?: 'inline' | 'full';
+}
+
+const {
+  images = [],
+  columns = 3,
+  lightbox = true,
+  caption,
+  variant = 'full',
+} = Astro.props;
+---
+
+<figure class:list={['post-gallery', `cols-${columns}`, `variant-${variant}`]}>
+  <div class="gallery-grid">
+    {images.map((img, idx) => (
+      <div class="gallery-cell">
+        {lightbox ? (
+          <button
+            type="button"
+            class="gallery-trigger"
+            data-lightbox-item
+            data-lightbox-src={img.src}
+            data-lightbox-alt={img.alt}
+            data-lightbox-caption={img.caption || img.alt}
+            aria-label={`Enlarge gallery image ${idx + 1}: ${img.alt}`}
+          >
+            <div class="gallery-img-wrap">
+              <img
+                src={img.src}
+                alt={img.alt}
+                loading="lazy"
+                decoding="async"
+              />
+              <span class="gallery-index" aria-hidden="true">[{idx + 1}]</span>
+            </div>
+            {img.caption && <span class="cell-caption">{img.caption}</span>}
+          </button>
+        ) : (
+          <div class="gallery-static">
+            <div class="gallery-img-wrap">
+              <img
+                src={img.src}
+                alt={img.alt}
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            {img.caption && <span class="cell-caption">{img.caption}</span>}
+          </div>
+        )}
+      </div>
+    ))}
+  </div>
+
+  {caption && (
+    <figcaption class="gallery-caption">
+      <span class="caption-prefix" aria-hidden="true">gallery ({images.length} items) //</span> {caption}
+    </figcaption>
+  )}
+</figure>
+
+<style>
+  .post-gallery {
+    margin: 2rem 0;
+    padding: 0;
+  }
+
+  .post-gallery.variant-full {
+    width: min(var(--max-width), calc(100vw - 2.5rem));
+  }
+
+  .gallery-grid {
+    display: grid;
+    gap: 0.85rem;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  @media (min-width: 640px) {
+    .post-gallery.cols-2 .gallery-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .post-gallery.cols-3 .gallery-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .post-gallery.cols-4 .gallery-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    .post-gallery.cols-5 .gallery-grid {
+      grid-template-columns: repeat(5, 1fr);
+    }
+  }
+
+  .gallery-cell {
+    display: flex;
+  }
+
+  .gallery-trigger,
+  .gallery-static {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 0;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    text-align: left;
+    font-family: var(--font-mono);
+    color: var(--text-primary);
+  }
+
+  .gallery-trigger {
+    cursor: zoom-in;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+
+  .gallery-trigger:hover,
+  .gallery-trigger:focus-visible {
+    border-color: var(--accent);
+  }
+
+  .gallery-img-wrap {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    width: 100%;
+    background-color: var(--bg-code);
+    overflow: hidden;
+  }
+
+  .gallery-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border: none;
+    border-radius: 0;
+    transition: transform 0.25s ease;
+  }
+
+  .gallery-trigger:hover .gallery-img-wrap img {
+    transform: scale(1.03);
+  }
+
+  .gallery-index {
+    position: absolute;
+    top: 0.45rem;
+    left: 0.45rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--accent);
+    background-color: rgba(21, 24, 30, 0.85);
+    border: 1px solid var(--border-color);
+    padding: 0.08rem 0.35rem;
+    border-radius: 2px;
+  }
+
+  .cell-caption {
+    display: block;
+    padding: 0.45rem 0.65rem;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    border-top: 1px solid var(--border-subtle);
+    line-height: 1.4;
+  }
+
+  .gallery-caption {
+    margin-top: 0.6rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+  }
+
+  .caption-prefix {
+    color: var(--accent);
+    font-weight: 600;
+  }
+</style>
+

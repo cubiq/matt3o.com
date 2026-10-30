@@ -1,0 +1,253 @@
+---
+import { SITE_TITLE, SITE_TAGLINE } from "../consts";
+import { getAllCategories } from "../utils/posts";
+
+const categories = await getAllCategories();
+const pathname = Astro.url.pathname;
+
+function isActive(href: string): boolean {
+  if (href === "/") return pathname === "/";
+  return pathname.startsWith(href);
+}
+---
+
+<header class="site-header">
+  <div class="container">
+    <div class="header-top">
+      <a href="/" class="brand-link" aria-label={SITE_TITLE}>
+        <span class="prompt-prefix">web@log</span><span class="prompt-colon"
+          >:</span
+        ><span class="prompt-path">~</span><span class="prompt-dollar">$</span>
+        <span class="brand-title">{SITE_TITLE}</span>
+        <span class="cursor-blink" aria-hidden="true"></span>
+      </a>
+
+      <nav class="main-nav" aria-label="Primary navigation">
+        <a
+          href="/"
+          class:list={[
+            "nav-link",
+            {
+              active:
+                isActive("/") &&
+                !pathname.startsWith("/categories") &&
+                !pathname.startsWith("/tags"),
+            },
+          ]}
+        >
+          [posts]
+        </a>
+        <a
+          href="/categories"
+          class:list={["nav-link", { active: isActive("/categories") }]}
+        >
+          [categories]
+        </a>
+        <a
+          href="/tags"
+          class:list={["nav-link", { active: isActive("/tags") }]}
+        >
+          [tags]
+        </a>
+        <a
+          href="/about"
+          class:list={["nav-link", { active: isActive("/about") }]}
+        >
+          [about]
+        </a>
+        <button
+          type="button"
+          class="search-trigger-btn"
+          id="open-search-btn"
+          aria-label="Search posts (Shortcut: /)"
+          title="Search posts (Press / or Ctrl+K)"
+        >
+          <span class="search-icon" aria-hidden="true">/</span>
+          <span>search</span>
+        </button>
+      </nav>
+    </div>
+
+    <div class="header-sub">
+      <p class="tagline">// {SITE_TAGLINE}</p>
+      <nav class="category-bar" aria-label="Categories">
+        <span class="cat-bar-label">dirs:</span>
+        <a href="/" class:list={["cat-bar-item", { active: pathname === "/" }]}
+          >all/</a
+        >
+        {
+          categories.map((cat) => (
+            <a
+              href={`/categories/${cat.slug}`}
+              class:list={[
+                "cat-bar-item",
+                {
+                  active:
+                    pathname === `/categories/${cat.slug}` ||
+                    pathname === `/categories/${cat.slug}/`,
+                },
+              ]}
+            >
+              {cat.name.toLowerCase()}/
+              <span class="cat-count">({cat.count})</span>
+            </a>
+          ))
+        }
+      </nav>
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    background-color: var(--bg-surface);
+    border-bottom: 1px solid var(--border-color);
+    padding: 1.1rem 0 0.85rem;
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    backdrop-filter: blur(8px);
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+  }
+
+  .brand-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    text-decoration: none;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+  }
+
+  .brand-link:hover .brand-title {
+    color: var(--accent-bright);
+  }
+
+  .prompt-colon,
+  .prompt-dollar {
+    color: var(--text-secondary);
+  }
+
+  .brand-title {
+    font-weight: 700;
+    color: var(--accent);
+    margin-left: 0.25rem;
+  }
+
+  .main-nav {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .nav-link {
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-size: 0.88rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+  }
+
+  .nav-link:hover,
+  .nav-link:focus-visible {
+    color: var(--accent-bright);
+    background-color: var(--accent-dim);
+  }
+
+  .nav-link.active {
+    color: var(--accent);
+    border-color: var(--accent-border);
+    background-color: var(--accent-dim);
+    font-weight: 600;
+  }
+
+  .search-trigger-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.84rem;
+    color: var(--text-primary);
+    background-color: var(--bg-elevated);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 0.25rem 0.65rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .search-trigger-btn:hover,
+  .search-trigger-btn:focus-visible {
+    color: var(--accent-bright);
+    border-color: var(--accent-border);
+    background-color: var(--accent-dim);
+  }
+
+  .search-icon {
+    display: inline-block;
+    padding: 0 0.3rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #14171c;
+    background-color: var(--accent);
+    border-radius: 2px;
+  }
+
+  .header-sub {
+    margin-top: 0.65rem;
+    padding-top: 0.6rem;
+    border-top: 1px dashed var(--border-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    font-size: 0.8rem;
+  }
+
+  .tagline {
+    margin: 0;
+    color: var(--text-muted);
+  }
+
+  .category-bar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .cat-bar-label {
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  .cat-bar-item {
+    text-decoration: none;
+    color: var(--text-secondary);
+    padding: 0.08rem 0.35rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .cat-bar-item:hover,
+  .cat-bar-item.active {
+    color: var(--accent);
+    background-color: var(--accent-dim);
+  }
+
+  .cat-count {
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    margin-left: 1px;
+  }
+</style>

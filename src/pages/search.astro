@@ -1,0 +1,255 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getAllCategories } from '../utils/posts';
+
+const categories = await getAllCategories();
+---
+
+<BaseLayout title="Search" description="Search articles on matt3o.com by keyword, category, or tag.">
+  <div class="search-page terminal-box">
+    <div class="terminal-box-header">
+      <span>// interactive full-text search</span>
+      <span>index: /search-index.json</span>
+    </div>
+
+    <div class="search-page-body">
+      <h1><span class="prompt-prefix">$</span> grep -ri "query" ./posts/</h1>
+
+      <div class="page-search-bar">
+        <label for="page-search-input" class="sr-only">Search query</label>
+        <span class="prompt-prefix">&gt;</span>
+        <input
+          type="search"
+          id="page-search-input"
+          placeholder="Search by title, tag, category, or post content..."
+          autocomplete="off"
+          autofocus
+        />
+      </div>
+
+      <div class="category-filters" role="group" aria-label="Filter by category">
+        <button type="button" class="filter-chip active" data-cat="">All Categories</button>
+        {categories.map((cat) => (
+          <button type="button" class="filter-chip" data-cat={cat.slug}>
+            {cat.name} ({cat.count})
+          </button>
+        ))}
+      </div>
+
+      <p id="page-search-count" class="page-search-count" aria-live="polite">
+        Loading search index...
+      </p>
+
+      <div id="page-search-results" class="page-search-results"></div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  interface SearchEntry {
+    slug: string;
+    title: string;
+    description: string;
+    category: string;
+    categorySlug: string;
+    tags: string[];
+    date: string;
+    body: string;
+  }
+
+  async function initSearchPage() {
+    const input = document.getElementById('page-search-input') as HTMLInputElement | null;
+    const countEl = document.getElementById('page-search-count');
+    const resultsEl = document.getElementById('page-search-results');
+    const catButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('.filter-chip'));
+
+    if (!input || !countEl || !resultsEl) return;
+
+    const params = new URLSearchParams(window.location.search);
+    const initialQuery = params.get('q') || params.get('keyword') || '';
+    if (initialQuery) input.value = initialQuery;
+
+    let selectedCat = '';
+    let entries: SearchEntry[] = [];
+
+    try {
+      const res = await fetch('/search-index.json');
+      entries = await res.json();
+    } catch {
+      countEl.textContent = 'Error loading search index.';
+      return;
+    }
+
+    function escapeHtml(str: string): string {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function update() {
+      const q = input!.value.trim().toLowerCase();
+      const filtered = entries.filter((item) => {
+        if (selectedCat && item.categorySlug !== selectedCat) return false;
+        if (!q) return true;
+        const text = `${item.title} ${item.description} ${item.category} ${item.tags.join(' ')} ${item.body}`.toLowerCase();
+        return q.split(/\s+/).every((word) => text.includes(word));
+      });
+
+      countEl!.textContent = `Showing ${filtered.length} of ${entries.length} entries`;
+
+      resultsEl!.innerHTML = filtered
+        .map(
+          (item) => `
+          <article class="page-result-card">
+            <div class="prc-meta">
+              <a href="/categories/${encodeURIComponent(item.categorySlug)}" class="cat-badge">${escapeHtml(item.category)}</a>
+              <time class="prc-date">${escapeHtml(item.date)}</time>
+            </div>
+            <h2 class="prc-title">
+              <a href="/${encodeURIComponent(item.slug)}/">${escapeHtml(item.title)}</a>
+            </h2>
+            <p class="prc-desc">${escapeHtml(item.description)}</p>
+            <div class="prc-tags">
+              ${item.tags.map((t) => `<span class="tag-chip">${escapeHtml(t)}</span>`).join('')}
+            </div>
+          </article>
+        `
+        )
+        .join('');
+    }
+
+    input.addEventListener('input', update);
+
+    catButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        catButtons.forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedCat = btn.dataset.cat || '';
+        update();
+      });
+    });
+
+    update();
+  }
+
+  initSearchPage();
+</script>
+
+<style is:global>
+  .search-page-body {
+    padding: 1.5rem;
+  }
+
+  .search-page-body h1 {
+    margin-top: 0;
+    font-size: 1.45rem;
+  }
+
+  .page-search-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.75rem 1rem;
+    background-color: var(--bg-code);
+    border: 1px solid var(--accent-border);
+    border-radius: var(--radius-sm);
+    margin-bottom: 1rem;
+  }
+
+  .page-search-bar input {
+    width: 100%;
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    color: var(--text-primary);
+    background: transparent;
+    border: 0;
+    outline: none;
+  }
+
+  .category-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .filter-chip {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    background-color: var(--bg-elevated);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 0.25rem 0.65rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .filter-chip:hover,
+  .filter-chip.active {
+    color: #14171c;
+    background-color: var(--accent);
+    border-color: var(--accent);
+    font-weight: 600;
+  }
+
+  .page-search-count {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+  }
+
+  .page-search-results {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .page-result-card {
+    padding: 1.1rem 1.25rem;
+    background-color: var(--bg-elevated);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+  }
+
+  .prc-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .prc-date {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+
+  .prc-title {
+    margin: 0 0 0.4rem;
+    font-size: 1.15rem;
+  }
+
+  .prc-title a {
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+
+  .prc-title a:hover {
+    color: var(--accent);
+    text-decoration: underline;
+  }
+
+  .prc-desc {
+    margin: 0 0 0.75rem;
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+  }
+
+  .prc-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+</style>
+

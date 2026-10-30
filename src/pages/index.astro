@@ -1,0 +1,282 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostCard from '../components/PostCard.astro';
+import { getPublishedPosts, getAllCategories, getAllTags } from '../utils/posts';
+import { POSTS_PER_PAGE } from '../consts';
+
+const allPosts = await getPublishedPosts();
+const totalPages = Math.ceil(allPosts.length / POSTS_PER_PAGE);
+const posts = allPosts.slice(0, POSTS_PER_PAGE);
+const categories = await getAllCategories();
+const tags = await getAllTags();
+---
+
+<BaseLayout>
+  <section class="intro-banner terminal-box">
+    <div class="terminal-box-header">
+      <div class="intro-top-left">
+        <span class="terminal-dots" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </span>
+        <span class="session-title">session: matt3o@workshop: ~/log</span>
+      </div>
+      <span class="session-meta">{allPosts.length} entries indexed</span>
+    </div>
+
+    <div class="intro-body">
+      <p class="intro-cmd">
+        <span class="prompt-prefix">matt3o@log</span>:<span class="prompt-path">~</span>$ cat motd.txt
+      </p>
+      <p class="intro-text">
+        Welcome to <strong>matt3o.com</strong> &mdash; a maker's log on custom keycap profiles (MT3, MTNU, PBS, PFF), mechanical keyboards, 3D printing, Linux systems, and open hardware projects.
+      </p>
+      <div class="intro-links">
+        <div class="quick-cats">
+          {categories.map((cat) => (
+            <a href={`/categories/${cat.slug}`} class="cat-pill">
+              <span class="cat-pill-name">{cat.name}</span>
+              <span class="cat-pill-count">{cat.count}</span>
+            </a>
+          ))}
+          <a href="/archive" class="cat-pill archive-pill">
+            <span class="cat-pill-name">All Posts Archive</span>
+            <span class="cat-pill-count">{allPosts.length}</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="latest-posts-section" aria-labelledby="latest-heading">
+    <div class="section-header">
+      <h1 id="latest-heading" class="section-title">
+        <span class="prompt-prefix">$</span> ls -lt ./posts/ | head -n {POSTS_PER_PAGE}
+      </h1>
+      <span class="section-sub">Page 1 of {totalPages} ({allPosts.length} total articles)</span>
+    </div>
+
+    <div class="posts-stack">
+      {posts.map((post, idx) => (
+        <PostCard post={post} priority={idx === 0} />
+      ))}
+    </div>
+
+    {totalPages > 1 && (
+      <nav class="pagination-bar terminal-box" aria-label="Pagination">
+        <span class="page-btn disabled" aria-disabled="true">&larr; newer</span>
+        <div class="page-numbers">
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
+            <a
+              href={num === 1 ? '/' : `/page/${num}`}
+              class:list={['page-num', { active: num === 1 }]}
+              aria-current={num === 1 ? 'page' : undefined}
+            >
+              [{num}]
+            </a>
+          ))}
+        </div>
+        <a href="/page/2" class="page-btn">older &rarr;</a>
+      </nav>
+    )}
+  </section>
+
+  <aside class="tags-cloud-box terminal-box" aria-labelledby="tags-cloud-heading">
+    <div class="terminal-box-header">
+      <span id="tags-cloud-heading" class="cloud-title">// topic tags</span>
+      <a href="/tags" class="view-all-link">view all tags &rarr;</a>
+    </div>
+    <div class="tags-cloud-body">
+      {tags.map((tag) => (
+        <a href={`/tags/${tag.slug}`} class="tag-chip">
+          {tag.name} <span class="tag-num">({tag.count})</span>
+        </a>
+      ))}
+    </div>
+  </aside>
+</BaseLayout>
+
+<style>
+  .intro-banner {
+    margin-bottom: 2.5rem;
+  }
+
+  .intro-top-left {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .session-title {
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .session-meta {
+    color: var(--term-green);
+    font-size: 0.75rem;
+  }
+
+  .intro-body {
+    padding: 1.15rem 1.35rem;
+  }
+
+  .intro-cmd {
+    margin: 0 0 0.5rem;
+    font-size: 0.86rem;
+    color: var(--text-secondary);
+  }
+
+  .intro-text {
+    margin: 0 0 1rem;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    line-height: 1.65;
+  }
+
+  .quick-cats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .cat-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.22rem 0.65rem;
+    font-size: 0.8rem;
+    text-decoration: none;
+    color: var(--text-primary);
+    background-color: var(--bg-elevated);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    transition: all 0.15s ease;
+  }
+
+  .cat-pill:hover,
+  .cat-pill:focus-visible {
+    border-color: var(--accent);
+    color: var(--accent-bright);
+    background-color: var(--accent-dim);
+  }
+
+  .archive-pill {
+    border-color: var(--accent-border);
+  }
+
+  .cat-pill-name {
+    font-weight: 600;
+  }
+
+  .cat-pill-count {
+    font-size: 0.72rem;
+    color: var(--accent);
+    background-color: rgba(0, 0, 0, 0.25);
+    padding: 0.05rem 0.35rem;
+    border-radius: 2px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px dashed var(--border-color);
+  }
+
+  .section-title {
+    margin: 0;
+    font-size: 1.25rem;
+  }
+
+  .section-sub {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  .posts-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+
+  .pagination-bar {
+    margin-top: 2.25rem;
+    padding: 0.75rem 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .page-numbers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .page-num {
+    text-decoration: none;
+    color: var(--text-secondary);
+    padding: 0.2rem 0.45rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .page-num:hover,
+  .page-num.active {
+    color: #14171c;
+    background-color: var(--accent);
+    font-weight: 700;
+  }
+
+  .page-btn {
+    text-decoration: none;
+    color: var(--accent);
+    font-weight: 600;
+    padding: 0.25rem 0.65rem;
+    border: 1px solid var(--accent-border);
+    border-radius: var(--radius-sm);
+  }
+
+  .page-btn:hover:not(.disabled) {
+    background-color: var(--accent-dim);
+  }
+
+  .page-btn.disabled {
+    color: var(--text-muted);
+    border-color: var(--border-subtle);
+    cursor: default;
+  }
+
+  .tags-cloud-box {
+    margin-top: 3rem;
+  }
+
+  .cloud-title {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .view-all-link {
+    font-size: 0.78rem;
+    text-decoration: none;
+  }
+
+  .tags-cloud-body {
+    padding: 1rem 1.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .tag-num {
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    margin-left: 0.2rem;
+  }
+</style>

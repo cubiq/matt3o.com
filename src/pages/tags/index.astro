@@ -1,0 +1,92 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getAllTags } from "../../utils/posts";
+
+const tags = await getAllTags();
+---
+
+<BaseLayout
+  title="Tags"
+  description="Browse all topic tags across mechanical keyboards, keycaps, Linux, 3D printing, and open source."
+>
+  <div class="page-head">
+    <h1 class="page-title">
+      <span class="prompt-prefix">$</span> grep -o '#[a-z0-9-]*' ./posts/*
+    </h1>
+    <p class="page-desc">
+      All topic tags indexed across {tags.length} subjects.
+    </p>
+  </div>
+
+  <div class="tags-panel terminal-box">
+    <div class="terminal-box-header">
+      <span>// tag index</span>
+      <span>{tags.length} tags total</span>
+    </div>
+    <div class="tags-grid">
+      {
+        tags.map((tag) => (
+          <a href={`/tags/${tag.slug}`} class="tag-card">
+            <span class="tag-name">#{tag.name}</span>
+            <span class="tag-count">{tag.count}</span>
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .page-head {
+    margin-bottom: 2rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px dashed var(--border-color);
+  }
+
+  .page-title {
+    margin: 0 0 0.4rem;
+    font-size: 1.5rem;
+  }
+
+  .page-desc {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.92rem;
+  }
+
+  .tags-grid {
+    padding: 1.25rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .tag-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 0.85rem;
+    background-color: var(--bg-elevated);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    transition: all 0.15s ease;
+  }
+
+  .tag-card:hover,
+  .tag-card:focus-visible {
+    border-color: var(--accent);
+    background-color: var(--accent-dim);
+  }
+
+  .tag-name {
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 0.88rem;
+  }
+
+  .tag-count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+</style>

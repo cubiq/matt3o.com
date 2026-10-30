@@ -1,0 +1,132 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getPublishedPosts, formatDate } from '../utils/posts';
+import { slugify } from '../consts';
+
+const posts = await getPublishedPosts();
+
+const postsByYear = new Map<number, typeof posts>();
+for (const post of posts) {
+  const year = post.data.pubDate.getFullYear();
+  const list = postsByYear.get(year) || [];
+  list.push(post);
+  postsByYear.set(year, list);
+}
+const years = Array.from(postsByYear.keys()).sort((a, b) => b - a);
+---
+
+<BaseLayout title="Archive" description={`Complete chronological archive of all ${posts.length} articles on matt3o.com.`}>
+  <div class="page-head">
+    <h1 class="page-title"><span class="prompt-prefix">$</span> find ./posts -type f | sort -r</h1>
+    <p class="page-desc">Chronological index of all {posts.length} log entries ({years[years.length - 1]} &ndash; {years[0]}).</p>
+  </div>
+
+  <div class="years-stack">
+    {years.map((year) => {
+      const yearPosts = postsByYear.get(year) || [];
+      return (
+        <section class="year-box terminal-box" aria-labelledby={`year-${year}`}>
+          <div class="terminal-box-header">
+            <h2 id={`year-${year}`} class="year-heading">// {year}</h2>
+            <span class="cat-badge">{yearPosts.length} {yearPosts.length === 1 ? 'entry' : 'entries'}</span>
+          </div>
+          <ul class="archive-list">
+            {yearPosts.map((post) => (
+              <li class="archive-row">
+                <time datetime={post.data.pubDate.toISOString()} class="archive-date">
+                  {formatDate(post.data.pubDate)}
+                </time>
+                <a href={`/categories/${slugify(post.data.category)}`} class="archive-cat">
+                  [{post.data.category}]
+                </a>
+                <a href={`/${post.id}/`} class="archive-title">
+                  {post.data.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      );
+    })}
+  </div>
+</BaseLayout>
+
+<style>
+  .page-head {
+    margin-bottom: 2rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px dashed var(--border-color);
+  }
+
+  .page-title {
+    margin: 0 0 0.4rem;
+    font-size: 1.5rem;
+  }
+
+  .page-desc {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.92rem;
+  }
+
+  .years-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .year-heading {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--accent);
+  }
+
+  .archive-list {
+    list-style: none;
+    margin: 0;
+    padding: 0.5rem 1.1rem;
+  }
+
+  .archive-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.65rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px dashed var(--border-subtle);
+    font-size: 0.9rem;
+    flex-wrap: wrap;
+  }
+
+  .archive-row:last-child {
+    border-bottom: 0;
+  }
+
+  .archive-date {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    flex-shrink: 0;
+  }
+
+  .archive-cat {
+    color: var(--term-green);
+    font-size: 0.78rem;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+
+  .archive-cat:hover {
+    text-decoration: underline;
+  }
+
+  .archive-title {
+    color: var(--text-primary);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .archive-title:hover {
+    color: var(--accent);
+    text-decoration: underline;
+  }
+</style>
+

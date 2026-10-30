@@ -1,0 +1,157 @@
+---
+interface Props {
+  provider?: 'youtube' | 'vimeo' | 'peertube' | 'local';
+  id?: string;
+  src?: string;
+  title?: string;
+  caption?: string;
+  poster?: string;
+  variant?: 'inline' | 'full';
+}
+
+const {
+  provider,
+  id,
+  src = '',
+  title = 'Embedded video player',
+  caption,
+  poster,
+  variant = 'inline',
+} = Astro.props;
+
+function resolveEmbed(): { type: 'iframe' | 'video'; url: string; label: string } {
+  if (provider === 'local' || src.endsWith('.mp4') || src.endsWith('.webm') || src.endsWith('.ogg') || src.startsWith('/')) {
+    return { type: 'video', url: src, label: 'LOCAL MEDIA' };
+  }
+
+  if (provider === 'youtube' || src.includes('youtube.com') || src.includes('youtu.be')) {
+    let ytId = id || '';
+    if (!ytId && src) {
+      const match = src.match(/(?:v=|youtu\.be\/|embed\/)([a-zA-Z0-9_-]{11})/);
+      ytId = match ? match[1] : src;
+    }
+    return {
+      type: 'iframe',
+      url: `https://www.youtube-nocookie.com/embed/${ytId}`,
+      label: 'YOUTUBE',
+    };
+  }
+
+  if (provider === 'vimeo' || src.includes('vimeo.com')) {
+    let vimeoId = id || '';
+    if (!vimeoId && src) {
+      const match = src.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+      vimeoId = match ? match[1] : src;
+    }
+    return {
+      type: 'iframe',
+      url: `https://player.vimeo.com/video/${vimeoId}`,
+      label: 'VIMEO',
+    };
+  }
+
+  return {
+    type: 'iframe',
+    url: src,
+    label: (provider || 'STREAM').toUpperCase(),
+  };
+}
+
+const resolved = resolveEmbed();
+---
+
+<figure class:list={['post-video', 'terminal-box', `variant-${variant}`]}>
+  <div class="terminal-box-header">
+    <div class="video-header-left">
+      <span class="terminal-dots" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </span>
+      <span class="video-badge">[{resolved.label}]</span>
+      <span class="video-title">{title}</span>
+    </div>
+  </div>
+
+  <div class="video-frame">
+    {resolved.type === 'video' ? (
+      <video controls preload="metadata" poster={poster}>
+        <source src={resolved.url} />
+        Your browser does not support the HTML5 video tag.
+      </video>
+    ) : (
+      <iframe
+        src={resolved.url}
+        title={title}
+        loading="lazy"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen
+      ></iframe>
+    )}
+  </div>
+
+  {caption && (
+    <figcaption class="video-caption">
+      <span class="caption-prefix" aria-hidden="true">vid //</span> {caption}
+    </figcaption>
+  )}
+</figure>
+
+<style>
+  .post-video {
+    margin: 1.85rem 0;
+    overflow: hidden;
+  }
+
+  .post-video.variant-full {
+    width: min(var(--max-width), calc(100vw - 2.5rem));
+  }
+
+  .video-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-width: 0;
+  }
+
+  .video-badge {
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 0.74rem;
+  }
+
+  .video-title {
+    color: var(--text-primary);
+    font-size: 0.78rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .video-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background-color: var(--bg-code);
+  }
+
+  .video-frame iframe,
+  .video-frame video {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+  }
+
+  .video-caption {
+    padding: 0.55rem 0.9rem;
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    border-top: 1px solid var(--border-color);
+    background-color: var(--bg-surface);
+  }
+
+  .caption-prefix {
+    color: var(--accent);
+    font-weight: 600;
+  }
+</style>
+

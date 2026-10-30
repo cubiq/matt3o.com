@@ -1,0 +1,352 @@
+---
+// Native <dialog closedby="any"> quick search modal with client-side index lookup
+---
+
+<dialog id="search-dialog" closedby="any" aria-labelledby="search-dialog-title" class="search-modal">
+  <div class="search-shell">
+    <div class="search-header">
+      <div class="search-title-row">
+        <span class="prompt-prefix">grep -i</span>
+        <h2 id="search-dialog-title" class="search-heading">Search Log Entries</h2>
+      </div>
+      <form method="dialog" class="search-close-form">
+        <button type="submit" class="search-close-btn" aria-label="Close search dialog (Esc)">
+          [esc]
+        </button>
+      </form>
+    </div>
+
+    <div class="search-input-wrap">
+      <label for="modal-search-input" class="sr-only">Search posts by title, tag, category, or content</label>
+      <span class="input-prompt" aria-hidden="true">/</span>
+      <input
+        type="search"
+        id="modal-search-input"
+        class="search-input"
+        placeholder="Type keywords (e.g. keycaps, mt3, linux, 3d print, qmk)..."
+        autocomplete="off"
+        autofocus
+      />
+    </div>
+
+    <div id="modal-search-status" class="search-status" aria-live="polite">
+      Type to filter posts across titles, tags, categories, and full text.
+    </div>
+
+    <ul id="modal-search-results" class="search-results"></ul>
+
+    <div class="search-footer">
+      <span>Shortcut: <kbd>/</kbd> or <kbd>Ctrl+K</kbd></span>
+      <a href="/search" class="full-search-link">Open full search page &rarr;</a>
+    </div>
+  </div>
+</dialog>
+
+<script>
+  interface SearchEntry {
+    slug: string;
+    title: string;
+    description: string;
+    category: string;
+    categorySlug: string;
+    tags: string[];
+    date: string;
+    body: string;
+  }
+
+  function initSearchModal() {
+    const dialog = document.getElementById('search-dialog') as HTMLDialogElement | null;
+    const openBtn = document.getElementById('open-search-btn');
+    const input = document.getElementById('modal-search-input') as HTMLInputElement | null;
+    const resultsList = document.getElementById('modal-search-results');
+    const statusEl = document.getElementById('modal-search-status');
+
+    if (!dialog || !input || !resultsList || !statusEl) return;
+
+    let indexData: SearchEntry[] | null = null;
+    let loading = false;
+
+    async function loadIndex() {
+      if (indexData || loading) return;
+      loading = true;
+      statusEl!.textContent = 'Loading search index...';
+      try {
+        const res = await fetch('/search-index.json');
+        indexData = await res.json();
+        renderResults(input!.value);
+      } catch {
+        statusEl!.textContent = 'Failed to load search index.';
+      } finally {
+        loading = false;
+      }
+    }
+
+    function escapeHtml(str: string): string {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function renderResults(rawQuery: string) {
+      if (!indexData) return;
+      const query = rawQuery.trim().toLowerCase();
+
+      const matches = query
+        ? indexData.filter((item) => {
+            const haystack = `${item.title} ${item.description} ${item.category} ${item.tags.join(' ')} ${item.body}`.toLowerCase();
+            return query.split(/\s+/).every((term) => haystack.includes(term));
+          })
+        : indexData.slice(0, 6);
+
+      statusEl!.textContent = query
+        ? `Found ${matches.length} matching post${matches.length === 1 ? '' : 's'} for "${rawQuery.trim()}"`
+        : `Showing latest ${matches.length} posts (type to filter all ${indexData.length} posts)`;
+
+      resultsList!.innerHTML = matches
+        .map(
+          (item) => `
+        <li class="search-result-item">
+          <a href="/${encodeURIComponent(item.slug)}/" class="search-result-link">
+            <div class="sr-top">
+              <span class="sr-cat">[${escapeHtml(item.category)}]</span>
+              <span class="sr-title">${escapeHtml(item.title)}</span>
+              <span class="sr-date">${escapeHtml(item.date)}</span>
+            </div>
+            <p class="sr-desc">${escapeHtml(item.description)}</p>
+            <div class="sr-tags">
+              ${item.tags.map((t) => `<span class="sr-tag">#${escapeHtml(t)}</span>`).join(' ')}
+            </div>
+          </a>
+        </li>
+      `
+        )
+        .join('');
+    }
+
+    function openSearch() {
+      if (!dialog!.open) {
+        dialog!.showModal();
+        loadIndex();
+        input!.focus();
+      }
+    }
+
+    openBtn?.addEventListener('click', openSearch);
+
+    input.addEventListener('input', () => {
+      renderResults(input.value);
+    });
+
+    window.addEventListener('keydown', (e) => {
+      const target = e.target as HTMLElement | null;
+      const isEditable =
+        target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable);
+
+      if ((e.key === '/' && !isEditable && !dialog.open) || ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k')) {
+        e.preventDefault();
+        openSearch();
+      }
+    });
+
+    // Fallback for browsers without native <dialog closedby="any"> support
+    if (!('closedBy' in HTMLDialogElement.prototype)) {
+      let pressedOutside = false;
+      const isOutside = (e: PointerEvent) => {
+        const r = dialog.getBoundingClientRect();
+        return e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+      };
+      dialog.addEventListener('pointerdown', (e) => {
+        pressedOutside = isOutside(e);
+      });
+      dialog.addEventListener('pointerup', (e) => {
+        if (pressedOutside && isOutside(e)) {
+          dialog.close();
+        }
+      });
+    }
+  }
+
+  initSearchModal();
+</script>
+
+<style is:global>
+  .search-modal {
+    padding: 0;
+    border: 1px solid var(--accent-border);
+    border-radius: var(--radius-md);
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    width: min(92vw, 680px);
+    max-height: 82vh;
+    margin: 7vh auto auto;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75);
+  }
+
+  /* Scope display to dialog[open] per modern-web-guidance */
+  .search-modal[open] {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .search-shell {
+    display: flex;
+    flex-direction: column;
+    max-height: 82vh;
+    width: 100%;
+  }
+
+  .search-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.65rem 1rem;
+    background-color: var(--bg-elevated);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .search-title-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .search-heading {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .search-close-form {
+    margin: 0;
+  }
+
+  .search-close-btn {
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    color: var(--accent);
+    background-color: var(--bg-surface);
+    border: 1px solid var(--accent-border);
+    border-radius: var(--radius-sm);
+    padding: 0.15rem 0.5rem;
+    cursor: pointer;
+  }
+
+  .search-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background-color: var(--bg-code);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .input-prompt {
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 1.05rem;
+  }
+
+  .search-input {
+    width: 100%;
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    background: transparent;
+    border: 0;
+    outline: none;
+  }
+
+  .search-status {
+    padding: 0.45rem 1rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .search-results {
+    list-style: none;
+    margin: 0;
+    padding: 0.5rem;
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  .search-result-item + .search-result-item {
+    margin-top: 0.35rem;
+  }
+
+  .search-result-link {
+    display: block;
+    padding: 0.65rem 0.75rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: all 0.12s ease;
+  }
+
+  .search-result-link:hover,
+  .search-result-link:focus-visible {
+    background-color: var(--bg-elevated);
+    border-color: var(--accent-border);
+  }
+
+  .sr-top {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .sr-cat {
+    color: var(--accent);
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .sr-title {
+    font-weight: 600;
+    font-size: 0.92rem;
+    color: var(--text-primary);
+  }
+
+  .sr-date {
+    margin-left: auto;
+    font-size: 0.74rem;
+    color: var(--text-muted);
+  }
+
+  .sr-desc {
+    margin: 0.25rem 0 0.35rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.45;
+  }
+
+  .sr-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+  }
+
+  .search-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.55rem 1rem;
+    background-color: var(--bg-elevated);
+    border-top: 1px solid var(--border-color);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  .full-search-link {
+    font-size: 0.78rem;
+    text-decoration: none;
+  }
+</style>
+

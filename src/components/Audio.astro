@@ -1,0 +1,97 @@
+---
+interface Props {
+  src: string;
+  title: string;
+  caption?: string;
+  download?: boolean;
+}
+
+const { src, title, caption, download = true } = Astro.props;
+---
+
+<figure class="post-audio terminal-box">
+  <div class="terminal-box-header">
+    <div class="audio-header-left">
+      <span class="audio-icon" aria-hidden="true">&#9835; [AUDIO]</span>
+      <span class="audio-title">{title}</span>
+    </div>
+    {download && (
+      <a href={src} download class="audio-dl-link">
+        [&darr; download]
+      </a>
+    )}
+  </div>
+
+  <div class="audio-body">
+    <audio controls preload="metadata" class="audio-element">
+      <source src={src} />
+      Your browser does not support the audio element.
+    </audio>
+  </div>
+
+  {caption && (
+    <figcaption class="audio-caption">
+      <span class="caption-prefix" aria-hidden="true">snd //</span> {caption}
+    </figcaption>
+  )}
+</figure>
+
+<style>
+  .post-audio {
+    margin: 1.75rem 0;
+    overflow: hidden;
+  }
+
+  .audio-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+  }
+
+  .audio-icon {
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 0.76rem;
+  }
+
+  .audio-title {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 0.82rem;
+  }
+
+  .audio-dl-link {
+    font-size: 0.74rem;
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .audio-dl-link:hover {
+    color: var(--accent-bright);
+    text-decoration: underline;
+  }
+
+  .audio-body {
+    padding: 0.9rem 1rem;
+    background-color: var(--bg-code);
+  }
+
+  .audio-element {
+    width: 100%;
+    height: 38px;
+    display: block;
+  }
+
+  .audio-caption {
+    padding: 0.5rem 0.9rem;
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    border-top: 1px solid var(--border-color);
+  }
+
+  .caption-prefix {
+    color: var(--accent);
+    font-weight: 600;
+  }
+</style>
+

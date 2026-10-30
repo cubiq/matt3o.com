@@ -1,0 +1,148 @@
+---
+title: "How to build your WhiteFox"
+pubDate: 2016-05-19
+category: "DIY"
+tags: ["keyboards"]
+poster: "/how-to-build-your-whitefox/images/whitefox-full.jpg"
+---
+I just got a final sample of the WhiteFox and it's simply fantastic. The barebone kits will start shipping in a few days and I'm so excited to get your feedback. I hope you'll like it as much as I do, it has been a long and exhausting endeavor but it was totally worth it!
+
+Assembling the WhiteFox is easy but there are a couple of things you should be aware of so I compiled this quick how-to guide that will bring you to a safe build. Even if you are an experienced DIYer you might find some interesting pointers, so give this a quick read anyway. **Let's get started!**
+
+## What you need
+
+![howto components](/how-to-build-your-whitefox/images/01-howto-components.jpg)
+
+By now you should have:
+
+- the WhiteFox PCB
+- a plate of your choice
+- the case
+- costar stabilizers
+- a bag of screws
+- aluminum and rubber feet
+
+This represents the barebone kit. You of course also need:
+
+- micro-USB cable
+- switches
+- totally optional: LEDs
+- soldering iron or station
+- wire solder
+- possibly keycaps :)
+
+As per the **soldering iron** if you plan on building more stuff in the future I'd highly recommend the _Hakko FX888D_ or the _Weller WES51_. If you don't see yourself using it so often, you can find very inexpensive 60W soldering irons for around $15 / €15 (and they often also includes the solder). I would not suggest buying cheap soldering stations as they usually don't last long.
+
+Remember to grab some **wire solder** too. Any 0.8mm 60/40(-ish) should work. Don't take too big or too small gauges as they are harder to work with.
+
+The WhiteFox supports backlighting but **LEDs are totally optional**. Remember that if you add the LEDs you won't be able to open the switches afterwards to lube the slider or change spring. Desoldering the LEDs is a very tedious and dangerous business (I know it by direct experience), so make up your mind in advance. If you decide that you need backlight, I'd suggest you to take 2x3mm ~3v rectangular LEDs; they are a little harder to find but they are more compatible with thick keycaps. If you can't find them, try with 2mm round ones.
+
+## Soldering switches
+
+**NOTE:** there are various revisions of the Whitefox, if you have plate mounted stabilizers remember to mount them before soldering the switches!
+
+Take the plate, be sure to place the switches on the right side (doh!) which is the one with the sockets for the countersunk screws.
+
+Pick 5 switches --double **check that the two contact pins are straight**\-- and place them to the four corners and in the middle of the plate. If you have clicky or tactile switches always try them between your finger before soldering them. It is not uncommon to get one faulty switch.
+
+![switches](/how-to-build-your-whitefox/images/02-howto-5-switches.jpg)
+
+Flip the plate, align the PCB over the switches and gently press until all the 5 switches fit into their pad holes (you should be looking now at the side of the PCB with the little fox logo). Check that all switch housings touch the PCB looking at it from all sides. Also check that none of the pins bent when you pressed the PCB down.
+
+If all went well, it's time for soldering.
+
+If the PCB doesn't seem to stick well in position and comes off the switches you can use some clothespins or a rubber band to keep it in position until the 5 switches are soldered. **Be careful not to damage any on board component!**
+
+If you can change the temperature of your soldering station, I usually set it to 320°C. They sometimes suggest lower temps, but I wouldn't do that. Low heat means you need to stay longer over the components and we want to go as fast as possible without risking a _cold_ solder point. But anyway I'm not an expert, feel free to search soldering tutorials and see what the gurus have to say about this.
+
+The following is a quick video on how I solder the switches. It should show you how long to stay over the solder points and how much solder to use.
+
+<Video provider="youtube" id="_q2OUa-_DBo" title="YouTube video player" />
+
+You don't need much solder and you totally don't want a "solder blob". Also the solder point should be shiny, if it is opaque, you didn't heat it well enough and you should remelt the solder for few seconds.
+
+It happens that one solder point doesn't really want to come out well: too little solder, or the solder didn't fill the whole pad or the solder keeps sticking to the iron instead of the PCB. **Do NOT insist.** Let the solder point cool for a bit. Clean the iron tip over a damped sponge or some steel wool and start over. Do not keep warming the same point for too long or you risk to melt the switch plastic housing or worse the slider inside.
+
+This is how my solder points look. They might not be pretty but they work.
+
+![soldering](/how-to-build-your-whitefox/images/03-howto-soldering.jpg)
+
+## Time for testing!
+
+Before proceeding with all the other switches it might be a good idea to test that the PCB is actually working. They all passed QC but better safe than sorry!
+
+Put the plate on the WhiteFox case (you don't need any screw), connect the USB cable, open a text editor and press the center switch. **Congratulations!** The fox just typed its first character!
+
+If it doesn't work, don't panic. Unplug the USB cable, flip the PCB, plug the cable again and be careful not to short any component. Now try to push the small button that you see on the bottom of the PCB. If a little orange LED turns on, then the PCB is probably working and the problem is just a sloppy soldering job. Unplug the PCB and try to fix the switch solder points. I'm pretty sure it will work this time.
+
+Now that we know the PCB is working, disconnect the USB cable and proceed by adding all the remaining switches. Again check that the pins are straight and not bent. **The pins are quite delicate and you don't want to break them!**
+
+When all switches are in position, a long soldering session awaits you. Don't rush it and have fun!
+
+## Soldering LEDs
+
+Before proceeding with the LEDs I'd check that the keyboard worked at this stage. If you got a faulty switch (highly unlikely) it is easier to desolder it without the LED.
+
+Soldering LEDs is basically the same but the pads are smaller so it takes some practice.
+
+If you are really paranoid you might want to test all LEDs before soldering them. To do so you could use a standard 3v battery, be careful not to invert the polarity and keep the LED lit just for a second.
+
+The PCB has been designed so that the LEDs work in both orientations but the preferred position is **longer lead on square pad**. You'll see that the LED pads are one round and one square and one of the LED pins is longer. Let me stress on this: **put all the LEDs on the same orientation with the long leg on the square pad**.
+
+I usually proceed one row at a time. Straighten the LED pins and push them deeply into the switch. They usually stay in position by friction but if they don't you can slightly bend the pins once inserted into the PCB.
+
+![leds](/how-to-build-your-whitefox/images/04-howto-leds.jpg)
+
+You need a very little quantity of solder, but check that the pad is well covered. When you have finished the row you can cut the exceeding leads to the base. Now check again that all solder points are sane and happy. If one looks suspicious give it another run.
+
+Again, I'm no expert but this is how I solder LEDs.
+
+<Video provider="youtube" id="AgwyFVl1LW4" title="YouTube video player" />
+
+You can now test the board again to check that all LEDs are working. If one doesn't work re-check the solder points, if they look good you might have a faulty LED, you need to desolder it and try with a new one. If it still doesn't work it might be a broken trace. That is more complicated to fix, contact us, we'll try to help.
+
+## Almost done
+
+Now fasten the aluminum feet to the case, you don't need a screw driver, just hold the screw head with your thumb and screw in the feet.
+
+Then stick the rubber feet, two at 1mm from the bottom corners and one in the middle between the other two (use the Fox nose as a reference). For the sake of stability try to place them at the same distance from the bottom edge.
+
+![feet](/how-to-build-your-whitefox/images/06-howto-feet.jpg)
+
+Now fasten the plate to the case with the 8 tiny screws. There might be some aluminum dust inside the screw holes so be careful when tightening and do not push too hard. Stop just when the screw head is flush to the plate (probably one half-turn before you actually reached the end of the travel).
+
+Stabilizer time! Put the plate stabilizers in position, with the hook for the wire looking down. Slightly push the top small rail outwards so the stabilizer forms a nice straight U. If you are obsessed about smoothness you may also want to add some lubricant to some key spots on both stabilizers like shown in this picture.
+
+![stabs](/how-to-build-your-whitefox/images/05-howto-stabs.jpg)
+
+Now put the stabilizer bits to the keycaps (the longer part should be pointing up towards your monitor) and insert them into the wire, one side at a time and finally push the keycap into the switch stem. I shot a quick video not long ago that shows an alternative way to place costar stabilizers. You may want to [give it a look](https://youtu.be/WhRfIuKwqJo).
+
+All left to do is to position the remaining keycaps and enjoy the WhiteFox! The default firmware is very basic and you will very likely need to update it. To do so just head to the [online configurator](http://configurator.input.club/?layout=WhiteFox-AllBlank), it's pretty easy to use but in the coming days I'll post a quick tutorial about it as well.
+
+**Congratulations!** You've just built your first (second? third? ...) keyboard from scratch! Nothing is more gratifying than typing on a keyboard you can call your own. I hope you'll be enjoying the WhiteFox for long years! Drop me a line in the comments if you don't mind with a picture of your fox!
+
+## Troubleshooting
+
+### One or more switches don't work
+
+You probably just need to check the switch solder points. It is very likely that you missed a pad. Take a magnifying glass and check the incriminating switch, even better recheck all the pads.
+
+If more than one switch in the same column or row don't work you may have a broken trace, unfortunately it happens if --for example-- your soldering iron slipped over the PCB during the soldering session. That is easy to fix, you just need a small piece of electrical wire that will be used to bridge the broken trace. [Contact us](https://input.club/forums/forum/support/keyboards/whitefox), we'll try to help.
+
+### One or more LEDs don't work
+
+First of all check the LED pads, reheat the solder or maybe add some. Take a magnifying glass and verify that all solder points are good.
+
+If it still doesn't work it is likely that the LED is burnt. You need to desolder it and place a new one. Be very careful, it's easy to damage the PCB while desoldering.
+
+If a cluster of LEDs is not working you probably have a broken trace. It is easy to fix with a piece of electrical wire, but it might take some time to find out the culprit. First of all check if you can see any visible scratch on the PCB. If you can't find it, contact us and we'll try to help.
+
+### The keyboard does not work
+
+If the keyboard seems not to be working at all, try to connect it and press the button on the back of the PCB. If an LED lights up, the PCB should be fine, try to flash a new firmware from the [online configurator](http://configurator.input.club).
+
+If the LED does not turn on, chances are that either the PCB came without a bootloader or the board is fried. If you have a multimeter, check that the board receives current from the headers on the bottom of the PCB. If it does, you are probably missing the bootloader (easy fix but you need some gear). Otherwise you will probably need a replacement.
+
+### The keyboard is too good to be true
+
+I'm sorry, there's no fix for that. Enjoy it!

@@ -1,0 +1,346 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Lightbox from '../components/Lightbox.astro';
+import type { BlogPost } from '../utils/posts';
+import { formatDate, getReadingTime, getExcerpt } from '../utils/posts';
+import { slugify } from '../consts';
+
+interface Props {
+  post: BlogPost;
+  prevPost?: BlogPost;
+  nextPost?: BlogPost;
+}
+
+const { post, prevPost, nextPost } = Astro.props;
+const { title, description, pubDate, updatedDate, poster, posterAlt, category, tags } = post.data;
+const metaDescription = description || getExcerpt(post, 160);
+const categorySlug = slugify(category);
+const readTime = getReadingTime(post.body);
+---
+
+<BaseLayout title={title} description={metaDescription} image={poster}>
+  <article class="post-article">
+    <div class="post-breadcrumb">
+      <a href="/">~</a>
+      <span>/</span>
+      <a href={`/categories/${categorySlug}`}>{categorySlug}</a>
+      <span>/</span>
+      <span class="crumb-current">{post.id}</span>
+    </div>
+
+    <header class="post-header terminal-box">
+      <div class="terminal-box-header">
+        <div class="meta-left">
+          <span class="terminal-dots" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </span>
+          <a href={`/categories/${categorySlug}`} class="cat-badge">
+            {category}
+          </a>
+          <time datetime={pubDate.toISOString()} class="meta-date">
+            pub: {formatDate(pubDate)}
+          </time>
+          {updatedDate && (
+            <time datetime={updatedDate.toISOString()} class="meta-date updated">
+              (upd: {formatDate(updatedDate)})
+            </time>
+          )}
+        </div>
+        <span class="meta-readtime">{readTime} min read</span>
+      </div>
+
+      <div class="post-header-body">
+        <h1 class="post-title">{title}</h1>
+        {description && <p class="post-lead">{description}</p>}
+
+        {tags.length > 0 && (
+          <div class="post-tags">
+            {tags.map((tag) => (
+              <a href={`/tags/${slugify(tag)}`} class="tag-chip">
+                {tag}
+              </a>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {poster && (
+        <div class="post-hero-poster">
+          <button
+            type="button"
+            class="hero-lightbox-btn"
+            data-lightbox-item
+            data-lightbox-src={poster}
+            data-lightbox-alt={posterAlt || title}
+            data-lightbox-caption={posterAlt || title}
+            aria-label={`Enlarge poster image: ${posterAlt || title}`}
+          >
+            <img
+              src={poster}
+              alt={posterAlt || title}
+              width="920"
+              height="440"
+              fetchpriority="high"
+              decoding="async"
+            />
+            <span class="hero-zoom-hint" aria-hidden="true">[+ ENLARGE]</span>
+          </button>
+        </div>
+      )}
+    </header>
+
+    <div class="prose post-content" id="post-prose">
+      <slot />
+    </div>
+
+    <footer class="post-footer">
+      <div class="post-share-bar terminal-box">
+        <span>EOF // <strong class="eof-slug">{post.id}</strong></span>
+        <a href="#top" class="back-top-link">[&uarr; top]</a>
+      </div>
+
+      {(prevPost || nextPost) && (
+        <nav class="post-adjacent-nav" aria-label="Adjacent posts">
+          {prevPost ? (
+            <a href={`/${prevPost.id}/`} class="adj-card terminal-box prev">
+              <span class="adj-dir">&larr; older entry ({formatDate(prevPost.data.pubDate)})</span>
+              <span class="adj-title">{prevPost.data.title}</span>
+            </a>
+          ) : (
+            <div></div>
+          )}
+          {nextPost ? (
+            <a href={`/${nextPost.id}/`} class="adj-card terminal-box next">
+              <span class="adj-dir">newer entry ({formatDate(nextPost.data.pubDate)}) &rarr;</span>
+              <span class="adj-title">{nextPost.data.title}</span>
+            </a>
+          ) : (
+            <div></div>
+          )}
+        </nav>
+      )}
+    </footer>
+  </article>
+
+  <Lightbox />
+</BaseLayout>
+
+<script>
+  // Enhance Shiki code blocks with terminal language header & copy button
+  function enhanceCodeBlocks() {
+    const prose = document.getElementById('post-prose');
+    if (!prose) return;
+
+    const preBlocks = prose.querySelectorAll<HTMLPreElement>('pre.astro-code');
+    preBlocks.forEach((pre) => {
+      if (pre.parentElement?.classList.contains('code-block-wrapper')) return;
+
+      const lang = pre.getAttribute('data-language') || 'text';
+      const wrapper = document.createElement('div');
+      wrapper.className = 'code-block-wrapper';
+
+      const header = document.createElement('div');
+      header.className = 'code-block-header';
+
+      const langSpan = document.createElement('span');
+      langSpan.className = 'code-block-lang';
+      langSpan.textContent = `// ${lang}`;
+
+      const copyBtn = document.createElement('button');
+      copyBtn.type = 'button';
+      copyBtn.className = 'code-copy-btn';
+      copyBtn.textContent = '[copy]';
+      copyBtn.setAttribute('aria-label', 'Copy code snippet to clipboard');
+
+      copyBtn.addEventListener('click', async () => {
+        const code = pre.querySelector('code')?.innerText || pre.innerText;
+        try {
+          await navigator.clipboard.writeText(code);
+          copyBtn.textContent = '[copied!]';
+          setTimeout(() => {
+            copyBtn.textContent = '[copy]';
+          }, 1800);
+        } catch {
+          copyBtn.textContent = '[error]';
+        }
+      });
+
+      header.appendChild(langSpan);
+      header.appendChild(copyBtn);
+
+      pre.parentNode?.insertBefore(wrapper, pre);
+      wrapper.appendChild(header);
+      wrapper.appendChild(pre);
+    });
+  }
+
+  enhanceCodeBlocks();
+</script>
+
+<style>
+  .post-breadcrumb {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+  }
+
+  .post-breadcrumb a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .post-breadcrumb a:hover {
+    text-decoration: underline;
+  }
+
+  .crumb-current {
+    color: var(--text-secondary);
+  }
+
+  .post-header {
+    margin-bottom: 2.5rem;
+    overflow: hidden;
+  }
+
+  .meta-left {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+  }
+
+  .meta-date {
+    color: var(--text-secondary);
+  }
+
+  .meta-date.updated {
+    color: var(--term-green);
+  }
+
+  .meta-readtime {
+    color: var(--text-muted);
+  }
+
+  .post-header-body {
+    padding: 1.5rem 1.5rem 1.35rem;
+  }
+
+  .post-title {
+    margin: 0 0 0.75rem;
+    font-size: clamp(1.55rem, 3.2vw, 2.15rem);
+    line-height: 1.25;
+    color: var(--text-primary);
+  }
+
+  .post-lead {
+    margin: 0 0 1.15rem;
+    font-size: 1rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  .post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  .post-hero-poster {
+    border-top: 1px solid var(--border-color);
+    background-color: var(--bg-code);
+  }
+
+  .hero-lightbox-btn {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: zoom-in;
+  }
+
+  .post-hero-poster img {
+    display: block;
+    width: 100%;
+    max-height: 460px;
+    object-fit: cover;
+  }
+
+  .hero-zoom-hint {
+    position: absolute;
+    bottom: 0.65rem;
+    right: 0.65rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--accent);
+    background-color: rgba(21, 24, 30, 0.88);
+    border: 1px solid var(--accent-border);
+    padding: 0.15rem 0.5rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .post-footer {
+    margin-top: 3.5rem;
+  }
+
+  .post-share-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.65rem 1rem;
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+  }
+
+  .eof-slug {
+    color: var(--accent);
+  }
+
+  .back-top-link {
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .post-adjacent-nav {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1rem;
+  }
+
+  .adj-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 1rem 1.15rem;
+    text-decoration: none;
+    transition: border-color 0.15s ease;
+  }
+
+  .adj-card:hover {
+    border-color: var(--accent);
+  }
+
+  .adj-card.next {
+    text-align: right;
+  }
+
+  .adj-dir {
+    font-size: 0.75rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .adj-title {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+</style>

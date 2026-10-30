@@ -1,0 +1,39 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/Button.astro';
+---
+
+<BaseLayout title="404 Not Found" description="Page not found">
+  <div class="not-found terminal-box">
+    <div class="terminal-box-header">
+      <span>bash: cd: No such file or directory</span>
+      <span class="err-code">EXIT 404</span>
+    </div>
+    <div class="nf-body">
+      <h1><span class="prompt-prefix">404</span> // File Not Found</h1>
+      <p>The requested log entry or directory does not exist on this filesystem.</p>
+      <div>
+        <Button href="/" variant="primary" icon="arrow">Return to ~/ (Home)</Button>
+        <Button href="/search" variant="outline">Search Posts</Button>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .not-found {
+    max-width: 620px;
+    margin: 2rem auto;
+  }
+  .err-code {
+    color: var(--term-red);
+    font-weight: 700;
+  }
+  .nf-body {
+    padding: 2rem 1.75rem;
+  }
+  .nf-body h1 {
+    margin-top: 0;
+  }
+</style>
+

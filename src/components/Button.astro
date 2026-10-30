@@ -1,0 +1,125 @@
+---
+interface Props {
+  href: string;
+  label?: string;
+  variant?: 'primary' | 'outline' | 'ghost';
+  icon?: 'download' | 'external' | 'code' | 'arrow' | 'none';
+  download?: boolean | string;
+  meta?: string;
+  external?: boolean;
+}
+
+const {
+  href,
+  label,
+  variant = 'primary',
+  icon = 'none',
+  download = false,
+  meta,
+  external = false,
+} = Astro.props;
+
+const icons: Record<string, string> = {
+  download: '↓',
+  external: '↗',
+  code: '</>',
+  arrow: '→',
+  none: '',
+};
+
+const resolvedIcon =
+  icon !== 'none'
+    ? icons[icon]
+    : download
+      ? icons.download
+      : external
+        ? icons.external
+        : '';
+---
+
+<a
+  href={href}
+  class:list={['term-btn', `variant-${variant}`]}
+  download={download === true ? '' : typeof download === 'string' ? download : undefined}
+  target={external ? '_blank' : undefined}
+  rel={external ? 'noopener noreferrer' : undefined}
+>
+  {resolvedIcon && <span class="btn-icon" aria-hidden="true">[{resolvedIcon}]</span>}
+  <span class="btn-label">
+    {label ? label : <slot />}
+  </span>
+  {meta && <span class="btn-meta">{meta}</span>}
+</a>
+
+<style>
+  .term-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.86rem;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 0.5rem 0.95rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--accent);
+    margin: 0.35rem 0.5rem 0.35rem 0;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    line-height: 1.3;
+  }
+
+  .term-btn.variant-primary {
+    background-color: var(--accent);
+    color: #14171c;
+    border-color: var(--accent);
+  }
+
+  .term-btn.variant-primary:hover,
+  .term-btn.variant-primary:focus-visible {
+    background-color: var(--accent-bright);
+    border-color: var(--accent-bright);
+    color: #14171c;
+    transform: translateY(-1px);
+  }
+
+  .term-btn.variant-outline {
+    background-color: var(--bg-surface);
+    color: var(--accent);
+    border-color: var(--accent-border);
+  }
+
+  .term-btn.variant-outline:hover,
+  .term-btn.variant-outline:focus-visible {
+    background-color: var(--accent-dim);
+    border-color: var(--accent);
+    color: var(--accent-bright);
+    transform: translateY(-1px);
+  }
+
+  .term-btn.variant-ghost {
+    background-color: var(--bg-elevated);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+  }
+
+  .term-btn.variant-ghost:hover,
+  .term-btn.variant-ghost:focus-visible {
+    border-color: var(--accent-border);
+    color: var(--accent-bright);
+  }
+
+  .btn-icon {
+    font-weight: 700;
+  }
+
+  .btn-meta {
+    font-size: 0.72rem;
+    font-weight: 500;
+    padding: 0.1rem 0.4rem;
+    border-radius: 2px;
+    background-color: rgba(0, 0, 0, 0.22);
+    opacity: 0.9;
+  }
+</style>
+

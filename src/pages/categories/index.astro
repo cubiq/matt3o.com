@@ -1,0 +1,98 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getAllCategories } from "../../utils/posts";
+
+const categories = await getAllCategories();
+---
+
+<BaseLayout
+  title="Categories"
+  description="Browse blog posts by category: DIY, News, Reviews, Knowledge Base, Projects."
+>
+  <div class="page-head">
+    <h1 class="page-title">
+      <span class="prompt-prefix">$</span> ls -la ./categories/
+    </h1>
+    <p class="page-desc">
+      Main directories organizing builds, reviews, news, and documentation.
+    </p>
+  </div>
+
+  <div class="cat-grid">
+    {
+      categories.map((cat) => (
+        <a href={`/categories/${cat.slug}`} class="cat-card terminal-box">
+          <div class="terminal-box-header">
+            <span class="cat-dir">drwxr-xr-x // {cat.slug}/</span>
+            <span class="cat-badge">{cat.count}</span>
+          </div>
+          <div class="cat-card-body">
+            <h2>{cat.name}</h2>
+            <p>{cat.description}</p>
+          </div>
+        </a>
+      ))
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .page-head {
+    margin-bottom: 2rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px dashed var(--border-color);
+  }
+
+  .page-title {
+    margin: 0 0 0.4rem;
+    font-size: 1.5rem;
+  }
+
+  .page-desc {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.92rem;
+  }
+
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .cat-card {
+    text-decoration: none;
+    color: var(--text-primary);
+    transition:
+      border-color 0.15s ease,
+      transform 0.15s ease;
+  }
+
+  .cat-card:hover,
+  .cat-card:focus-visible {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  .cat-dir {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+  }
+
+  .cat-card-body {
+    padding: 1.15rem 1.25rem;
+  }
+
+  .cat-card-body h2 {
+    margin: 0 0 0.5rem;
+    font-size: 1.2rem;
+    color: var(--accent);
+  }
+
+  .cat-card-body p {
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    line-height: 1.55;
+  }
+</style>

@@ -1,0 +1,109 @@
+---
+import { SITE_TITLE, SITE_AUTHOR } from "../consts";
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="status-bar">
+      <div class="status-left">
+        <span class="status-mode">NORMAL</span>
+        <span class="status-file">utf-8 // astro-static</span>
+        <span class="status-hint">Tip: press <kbd>/</kbd> to search</span>
+      </div>
+      <div class="status-right">
+        <a href="/archive">[/archive]</a>
+        <a href="/search">[/search]</a>
+        <a href="/rss.xml">[/rss.xml]</a>
+        <a href="https://discord.gg/matt3o" rel="noopener noreferrer"
+          >[discord]</a
+        >
+        <a
+          href="https://mastodon.social/@cubiq"
+          rel="noopener noreferrer"
+          rel="me">[mastodon]</a
+        >
+        <a href="https://www.youtube.com/@matt3o" rel="noopener noreferrer"
+          >[youtube]</a
+        >
+        <a href="https://github.com/cubiq" rel="noopener noreferrer">[github]</a
+        >
+      </div>
+    </div>
+
+    <div class="footer-meta">
+      <p>
+        &copy; {year}
+        {SITE_AUTHOR} &mdash; <a href="/">{SITE_TITLE}</a> Licensed under <a
+          href="https://creativecommons.org/licenses/by-sa/4.0/"
+          class="underline">CC BY-SA 4.0</a
+        > (unless stated otherwise).
+      </p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--border-color);
+    background-color: var(--bg-surface);
+    padding: 1.25rem 0 1.75rem;
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+  }
+
+  .status-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    background-color: var(--bg-elevated);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 0.35rem 0.65rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .status-left,
+  .status-right {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .status-mode {
+    background-color: var(--accent);
+    color: #14171c;
+    font-weight: 700;
+    font-size: 0.74rem;
+    padding: 0.1rem 0.45rem;
+    border-radius: 2px;
+    letter-spacing: 0.04em;
+  }
+
+  .status-file {
+    color: var(--text-muted);
+  }
+
+  .status-hint {
+    color: var(--text-secondary);
+  }
+
+  .status-right a {
+    text-decoration: none;
+    color: var(--accent);
+  }
+
+  .status-right a:hover {
+    color: var(--accent-bright);
+    text-decoration: underline;
+  }
+
+  .footer-meta p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+  }
+</style>
